@@ -1,0 +1,51 @@
+This project is a hands on Security Operations Center home lab that I built to simulate real world monitoring, log ingestion, and detection and response techniques.
+The Lab uses Wazuh as a SIEM and Windows and Linux endpoints as well as a Kali Linux machine to simulate an outside attacker.
+
+Environment
+- Ubuntu Linux (Wazuh manager and Dashboard)
+- Windows Server - Domain Controller
+- Windows 10 - User Endpoint
+- Kali Linux - Outside Attacker
+
+Telemetry Sources
+- Windows Event Logs
+Sysmon(Process + Network Telemetry)
+Linux syslog
+Authentication events
+
+Objective
+- Monitor authentication, endpoint activity, and directory changes
+- Detect common attacker techniques
+- Proactice SOC-style triage and response
+
+Implementation Process
+Wazuh SIEM Deployment 
+- I began on my Ubuntu machine where I downloaded and configured Wazuh Manager, Indexer, and Dashboard
+- I then enrolled Wazuh agents on the Windows Server DC, Windows 10, and Ubuntu machines.
+- Resolved agent erollent issues I had like duplicate names and connectivity issues.
+- Verified persistent agent connectivity to the manager
+Image of Agents configured to the dashboard 
+![added agents](Images/WazuhDashboard.png)
+
+Windows Enpoint Telemetry(Sysmon)
+- Installed Sysmon on Windows endpoints
+- Troubleshot Sysmon configuration to make sure that important events were being logged such as proccess creations and network connections (Event ID1, ID3)
+- validated sysmon first locally using wevtutil
+- Confirmed Wazuh agent was ingesting Sysmon logs
+
+Current Attack Simulation
+- Used Kali Linux to simulate sttacker activity
+  - Port scans(Nmap)
+  - Connection attempts(SMB, RDP, HTTP) with incorrect credentials to simulate a password spray      attack
+- Generated detectable network activity through real TCP connections
+
+Then confirmed that events from endpoints were properly being logged and aggregated at the Wazuh Dashboard
+Here is an image from the dashboard looking at the security events for the Windows DC endpoint. You can see all of the different invalid login attempts that I simulated from the Kali Linux machine.
+![dashboard view](Images/WazuhDashboardAuthentication.png)
+
+Next Planned Enhancements
+- Add custom Wazuh rules to detect common attack vectors
+- Noise reduction and alert tuning
+- Integration of Suricata for network-based IDS detection
+- MITRE ATT&CK mapping for detected activity
+- Automation of common response techniques and workflows
