@@ -24,6 +24,8 @@ Wazuh SIEM Deployment
 - I then enrolled Wazuh agents on the Windows Server DC, Windows 10, and Ubuntu machines.
 - Resolved agent erollent issues I had like duplicate names and connectivity issues.
 - Verified persistent agent connectivity to the manager
+Image of Agents configured to the dashboard 
+![added agents](images/WazuhDashboard.png)
 
 Windows Enpoint Telemetry(Sysmon)
 - Installed Sysmon on Windows endpoints
@@ -38,7 +40,8 @@ Current Attack Simulation
 - Generated detectable network activity through real TCP connections
 
 Then confirmed that events from endpoints were properly being logged and aggregated at the Wazuh Dashboard
-
+Here is an image from the dashboard looking at the security events for the Windows DC endpoint. You can see all of the different invalid login attempts that I simulated from the Kali Linux machine.
+![dashboard view](images/WazuhDashboardAuthentication)
 
 Next Planned Enhancements
 - Add custom Wazuh rules to detect common attack vectors
