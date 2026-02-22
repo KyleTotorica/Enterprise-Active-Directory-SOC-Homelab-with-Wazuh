@@ -6,12 +6,15 @@ Environment
 - Windows Server - Domain Controller
 - Windows 10 - User Endpoint
 - Kali Linux - Outside Attacker
+- Ubuntu Server - Internal App Server(Flask app)
 
 Telemetry Sources
-- Windows Event Logs
+Windows Event Logs
 Sysmon(Process + Network Telemetry)
 Linux syslog
 Authentication events
+Nginx access + error logs
+Custom automation logs (watchdog restart log)
 
 Objective
 - Monitor authentication, endpoint activity, and directory changes
@@ -32,6 +35,15 @@ Windows Enpoint Telemetry(Sysmon)
 - Troubleshot Sysmon configuration to make sure that important events were being logged such as proccess creations and network connections (Event ID1, ID3)
 - validated sysmon first locally using wevtutil
 - Confirmed Wazuh agent was ingesting Sysmon logs
+
+Internal Application Server 
+- Built a new Ubuntu server to act as an internal production application host
+- Deployed a simple Flask app and ran it as a systemd service (internal-app.service)
+- Added Nginx reverse proxy so the app is available on port 80
+- Created Nginx access and error logs
+- Added a Wazuh agent on the app server
+- Configures the Wazuh agent to take in all Nginx access and error logs to display on the Wazuh dashboard to make it easy to troubleshoot
+
 
 Current Attack Simulation
 - Used Kali Linux to simulate sttacker activity
