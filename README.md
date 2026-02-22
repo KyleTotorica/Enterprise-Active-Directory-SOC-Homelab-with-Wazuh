@@ -20,6 +20,8 @@ Objective
 - Monitor authentication, endpoint activity, and directory changes
 - Detect common attacker techniques
 - Proactice SOC-style triage and response
+- Practice troubleshooting internal application outages using custom logs
+- Create simple automation to reduce downtime on services 
 
 Implementation Process
 Wazuh SIEM Deployment 
@@ -43,7 +45,20 @@ Internal Application Server
 - Created Nginx access and error logs
 - Added a Wazuh agent on the app server
 - Configures the Wazuh agent to take in all Nginx access and error logs to display on the Wazuh dashboard to make it easy to troubleshoot
+![internalappbrowser](Images/InternalAppRunning.png)
 
+Nginx Logs
+![nginxlogs](Images/nginxlogs.png)
+
+
+Automation/Self-correction(Watchdog)
+- Wrote a watchdog script that checks if the interal app service went down and if it is, automatically restarts it
+- Scheduled the watchdog with a root cron job that runs every 2 minutes
+- Logged all the retart actions to /var/log/internal-app-watchdog.log
+- Configured Wazuh agent to ingest the watchdog log so all restarts and service outages will show up in the Wazuh dashboard
+- Tested this by manually stopping the internal-app service and confirmed how the watchdog script restarted the servoce and how it was all logged and showed up in Wazuh
+
+  ![watchdogLog](Images/watchdogLogs.png)
 
 Current Attack Simulation
 - Used Kali Linux to simulate sttacker activity
