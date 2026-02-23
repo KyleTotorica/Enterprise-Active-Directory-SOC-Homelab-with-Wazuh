@@ -59,10 +59,13 @@ Automation/Self-correction(Watchdog)
 - Tested this by manually stopping the internal-app service and confirmed how the watchdog script restarted the servoce and how it was all logged and showed up in Wazuh
 
   ![watchdogLog](Images/watchdogLogs.png)
-
-
+  
   Service Health Monitoring
-  - 
+  - On the application server I created a custom health cheching script to check the availability of the internal app and its database
+  - I scheduled script - app_healthcheck.sh to run every minute via cron which calls the /health endpoint of the flask application that recoded:
+                      - Timestamp
+                      - HTTP status code
+                      - Overall service and database connectivity status(OK/FAIL)
 
 Current Attack Simulation
 - Used Kali Linux to simulate sttacker activity
@@ -73,6 +76,18 @@ Current Attack Simulation
 Then confirmed that events from endpoints were properly being logged and aggregated at the Wazuh Dashboard
 Here is an image from the dashboard looking at the security events for the Windows DC endpoint. You can see all of the different invalid login attempts that I simulated from the Kali Linux machine.
 ![dashboard view](Images/WazuhDashboardAuthentication.png)
+
+Incident Simmulation - Dependency Failure(Database Outage)
+- This icident was a controlled scenario that I ran just to ensure that my database and internal-app monitoring were working as I intended them to.
+- Scenario: The Database VM has been powered off
+- Observed Behavior:
+    - The /health endpoint now returned HTTP 500 errors
+    - My monitoring script began logging FAIL events every minute via cron job
+    - Nginx 500 alerts triggered
+- Resolution
+  - Database VM turned back on
+  - Healthmonitoring checks went back to returning OK
+  - Monitoring confirmed the recovery
 
 Next Planned Enhancements
 - Add custom Wazuh rules to detect common attack vectors
