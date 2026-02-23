@@ -1,5 +1,5 @@
 This project is a hands on Security Operations Center home lab that I built to simulate real world monitoring, log ingestion, and detection and response techniques.
-The Lab uses Wazuh as a SIEM and Windows and Linux endpoints as well as a Kali Linux machine to simulate an outside attacker.
+The lab uses Wazuh as a SIEM and Windows and Linux endpoints as well as a Kali Linux machine to simulate an outside attacker. The environment evolved into a multi-tier application architecture including an internal web application and a dedicated database server to simulate real production dependency monitoring and troubleshooting workflows.
 
 Environment
 - Ubuntu Linux (Wazuh manager and Dashboard)
@@ -7,6 +7,7 @@ Environment
 - Windows 10 - User Endpoint
 - Kali Linux - Outside Attacker
 - Ubuntu Server - Internal App Server(Flask app)
+- Ubuntu Server - Database Server(PostgreSQL)
 
 Telemetry Sources
 Windows Event Logs
@@ -50,6 +51,13 @@ Internal Application Server
 Nginx Logs
 ![nginxlogs](Images/nginxlogs.png)
 
+Database Tier Deployment (postgreSQL)
+- Built a dedicated Ubuntu database VM to add in a backend dependency for the internal application
+- Installed and configured postgreSQL as the primary database engine
+- Configured postgreSQL allowing for remote connections so I could connect in with the application server
+- updated listening addresses and pg_hba.conf to support authenticated connections from internal subnet
+- Checked connectivity from the app server
+Purpose - The purpose of the databse addition was to try and best reflect a real enterpise environment
 
 Automation/Self-correction(Watchdog)
 - Wrote a watchdog script that checks if the interal app service went down and if it is, automatically restarts it
@@ -66,6 +74,8 @@ Automation/Self-correction(Watchdog)
                       - Timestamp
                       - HTTP status code
                       - Overall service and database connectivity status(OK/FAIL)
+  - Updated the Flask /health endpoint to have a database connectivity check
+  - Allows the monitoring system to find service degredation even if the app process is still running. 
 
 Current Attack Simulation
 - Used Kali Linux to simulate sttacker activity
