@@ -54,11 +54,15 @@ Nginx Logs
 Automation/Self-correction(Watchdog)
 - Wrote a watchdog script that checks if the interal app service went down and if it is, automatically restarts it
 - Scheduled the watchdog with a root cron job that runs every 2 minutes
-- Logged all the retart actions to /var/log/internal-app-watchdog.log
+- Logged all the restart actions to /var/log/internal-app-watchdog.log
 - Configured Wazuh agent to ingest the watchdog log so all restarts and service outages will show up in the Wazuh dashboard
 - Tested this by manually stopping the internal-app service and confirmed how the watchdog script restarted the servoce and how it was all logged and showed up in Wazuh
 
   ![watchdogLog](Images/watchdogLogs.png)
+
+
+  Service Health Monitoring
+  - 
 
 Current Attack Simulation
 - Used Kali Linux to simulate sttacker activity
