@@ -39,7 +39,7 @@ Windows Enpoint Telemetry(Sysmon)
 - validated sysmon first locally using wevtutil
 - Confirmed Wazuh agent was ingesting Sysmon logs
 
-Internal Application Server 
+Internal Application Server (Blue/Green Deployment and Reverse Proxy)
 - Built a new Ubuntu server to act as an internal production application host
 - Deployed a simple Flask app and ran it as a systemd service (internal-app.service)
 - Added Nginx reverse proxy so the app is available on port 80
