@@ -64,36 +64,49 @@ Created a deployment/rollback script (switch-app.sh) that:
   - Reloads Nginx safely
   - Logs all deployment actions
 Added a Wazuh agent to ingest Nginx logs for operational visibility
+
 ![internalappbrowser](Images/InternalAppRunning.png)
 
 Nginx Logs
-![nginxlogs](Images/nginxlogs.png)
+![nginxlogs](Images/deployments.log.png)
 
-Database Tier Deployment (postgreSQL)
-- Built a dedicated Ubuntu database VM to add in a backend dependency for the internal application
-- Installed and configured postgreSQL as the primary database engine
-- Configured postgreSQL allowing for remote connections so I could connect in with the application server
-- updated listening addresses and pg_hba.conf to support authenticated connections from internal subnet
-- Checked connectivity from the app server
-Purpose - The purpose of the databse addition was to try and best reflect a real enterpise environment
+Database Tier Deployment (PostgreSQL)
+Built a dedicated Ubuntu database VM to introduce a backend dependency
+Installed and configured PostgreSQL as the application datastore
+Enabled secure remote connections from the application server
+Updated listen_addresses and pg_hba.conf to support authenticated internal access
+Verified connectivity from the application server
+Purpose: introduce realistic service dependency monitoring and failure scenarios.
 
-Automation/Self-correction(Watchdog)
-- Wrote a watchdog script that checks if the interal app service went down and if it is, automatically restarts it
-- Scheduled the watchdog with a root cron job that runs every 2 minutes
-- Logged all the restart actions to /var/log/internal-app-watchdog.log
-- Configured Wazuh agent to ingest the watchdog log so all restarts and service outages will show up in the Wazuh dashboard
-- Tested this by manually stopping the internal-app service and confirmed how the watchdog script restarted the servoce and how it was all logged and showed up in Wazuh
+Automation and Reliability Engineering
+Service Recovery Automation (Watchdog)
 
-  ![watchdogLog](Images/watchdogLogs.png)
+Developed a watchdog script to monitor critical services (Nginx + application services)
+Automatically restarts services if they become inactive
+Scheduled execution via cron
+Logged restart activity to /var/log/internal-app-watchdog.log
+Configured Wazuh to ingest watchdog logs for visibility into service outages and recovery actions
+Tested by intentionally stopping services and validating automatic recovery
+![watchdogLog](Images/watchdogLogs.png)
   
-  Service Health Monitoring
-  - On the application server I created a custom health cheching script to check the availability of the internal app and its database
-  - I scheduled script - app_healthcheck.sh to run every minute via cron which calls the /health endpoint of the flask application that recoded:
-                      - Timestamp
-                      - HTTP status code
-                      - Overall service and database connectivity status(OK/FAIL)
-  - Updated the Flask /health endpoint to have a database connectivity check
-  - Allows the monitoring system to find service degredation even if the app process is still running. 
+Service Health Monitoring
+Created a custom health monitoring script that calls the application /health endpoint
+Scheduled checks via cron every minute
+Logged:
+  - Timestamp
+  - HTTP status code
+  - Overall service and dependency health (OK / FAIL)
+Designed monitoring to detect degradation even when the application process is still running
+
+Escalation Triage Automation
+Built a triage bundle script that collects diagnostic data when health checks fail
+Captures:
+  - Service status snapshots
+  - Active Nginx upstream configuration
+  - Recent journal logs
+  - Network connectivity checks
+  - Stores bundles under /var/log/triage-bundles/ to simulate L2 escalation workflows
+Added cooldown logic to prevent alert/triage noise
 
 Current Attack Simulation
 - Used Kali Linux to simulate sttacker activity
