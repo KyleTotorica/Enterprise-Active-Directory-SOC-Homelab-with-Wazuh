@@ -108,31 +108,35 @@ Captures:
   - Stores bundles under /var/log/triage-bundles/ to simulate L2 escalation workflows
 Added cooldown logic to prevent alert/triage noise
 
-Current Attack Simulation
-- Used Kali Linux to simulate sttacker activity
-  - Port scans(Nmap)
-  - Connection attempts(SMB, RDP, HTTP) with incorrect credentials to simulate a password spray      attack
-- Generated detectable network activity through real TCP connections
+![TriageBundle](Images/triagebundlelog.png)
 
-Then confirmed that events from endpoints were properly being logged and aggregated at the Wazuh Dashboard
-Here is an image from the dashboard looking at the security events for the Windows DC endpoint. You can see all of the different invalid login attempts that I simulated from the Kali Linux machine.
+Attack Simulation
+Used Kali Linux to simulate attacker activity:
+  - Network scanning (Nmap)
+  - Authentication attempts (SMB, RDP, HTTP)
+  - Password spray style login attempts
+Generated real network telemetry and authentication failures
+Confirmed detection and aggregation within Wazuh
 ![dashboard view](Images/WazuhDashboardAuthentication.png)
 
-Incident Simmulation - Dependency Failure(Database Outage)
-- This icident was a controlled scenario that I ran just to ensure that my database and internal-app monitoring were working as I intended them to.
-- Scenario: The Database VM has been powered off
-- Observed Behavior:
-    - The /health endpoint now returned HTTP 500 errors
-    - My monitoring script began logging FAIL events every minute via cron job
-    - Nginx 500 alerts triggered
-- Resolution
-  - Database VM turned back on
-  - Healthmonitoring checks went back to returning OK
-  - Monitoring confirmed the recovery
+Incident Simulation — Dependency Failure (Database Outage)
+  - Conducted a controlled database outage scenario
+  - Powered off the database VM to simulate dependency failure
+Observed behavior:
+  - Application /health endpoint returned HTTP 500
+  - Monitoring logged FAIL events continuously
+  - Nginx surfaced upstream errors
+  - Triage bundle automation captured diagnostic evidence
+Resolution:
+  - Restored database service
+  - Health checks returned to OK
+  - Monitoring confirmed recovery
+This scenario validated dependency monitoring, detection, and recovery workflows.
 
 Next Planned Enhancements
-- Add custom Wazuh rules to detect common attack vectors
-- Noise reduction and alert tuning
-- Integration of Suricata for network-based IDS detection
-- MITRE ATT&CK mapping for detected activity
-- Automation of common response techniques and workflows
+Custom Wazuh detection rules for attacker techniques
+Alert tuning and noise reduction
+Suricata integration for network IDS visibility
+MITRE ATT&CK mapping for detections
+Automated response playbooks
+Additional deployment automation scenarios
