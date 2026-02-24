@@ -1,51 +1,69 @@
-This project is a hands on Security Operations Center home lab that I built to simulate real world monitoring, log ingestion, and detection and response techniques.
-The lab uses Wazuh as a SIEM and Windows and Linux endpoints as well as a Kali Linux machine to simulate an outside attacker. The environment evolved into a multi-tier application architecture including an internal web application and a dedicated database server to simulate real production dependency monitoring and troubleshooting workflows.
+Project Overview
+
+This project is a hands-on Security Operations Center (SOC) home lab designed to simulate real-world monitoring, log ingestion, incident detection, and operational troubleshooting workflows.
+
+The environment combines endpoint telemetry, centralized SIEM monitoring, and a multi-tier application architecture to mirror how production systems are monitored and supported. In addition to traditional security visibility, the lab focuses heavily on service reliability, dependency monitoring, controlled incident simulation, and operational automation.
+
+The lab uses Wazuh as the SIEM platform, Windows and Linux endpoints for telemetry, and a Kali Linux machine to simulate external attacker behavior. The environment evolved into a production-style architecture that includes an internal web application and a dedicated database server, enabling realistic monitoring of service dependencies and outage scenarios.
 
 Environment
-- Ubuntu Linux (Wazuh manager and Dashboard)
-- Windows Server - Domain Controller
-- Windows 10 - User Endpoint
-- Kali Linux - Outside Attacker
-- Ubuntu Server - Internal App Server(Flask app)
-- Ubuntu Server - Database Server(PostgreSQL)
+Ubuntu Linux — Wazuh Manager, Indexer, and Dashboard
+Windows Server — Domain Controller
+Windows 10 — User Endpoint
+Kali Linux — External attacker simulation
+Ubuntu Server — Internal Application Server (Flask + Nginx)
+Ubuntu Server — Database Server (PostgreSQL)
 
 Telemetry Sources
 Windows Event Logs
-Sysmon(Process + Network Telemetry)
+Sysmon (process and network telemetry)
 Linux syslog
-Authentication events
-Nginx access + error logs
-Custom automation logs (watchdog restart log)
+Authentication events (domain + local)
+Nginx access and error logs
+Application health logs
+Watchdog automation logs
+Deployment and triage automation logs
 
-Objective
-- Monitor authentication, endpoint activity, and directory changes
-- Detect common attacker techniques
-- Proactice SOC-style triage and response
-- Practice troubleshooting internal application outages using custom logs
-- Create simple automation to reduce downtime on services 
+Objectives
+Monitor authentication activity, endpoint behavior, and directory changes
+Detect attacker techniques using real telemetry
+Practice SOC-style triage and investigation workflows
+Practice troubleshooting internal application outages and dependency failures
+Implement automation to reduce downtime and accelerate recovery
+Simulate production support responsibilities (deployments, monitoring, escalation)
 
 Implementation Process
-Wazuh SIEM Deployment 
-- I began on my Ubuntu machine where I downloaded and configured Wazuh Manager, Indexer, and Dashboard
-- I then enrolled Wazuh agents on the Windows Server DC, Windows 10, and Ubuntu machines.
-- Resolved agent erollent issues I had like duplicate names and connectivity issues.
-- Verified persistent agent connectivity to the manager
-Image of Agents configured to the dashboard 
+Wazuh SIEM Deployment
+Installed and configured Wazuh Manager, Indexer, and Dashboard on Ubuntu
+Enrolled agents on Windows Server, Windows 10, and Linux systems
+Troubleshot agent enrollment issues including duplicate names and connectivity problems
+Verified persistent agent connectivity and log ingestion 
 ![added agents](Images/WazuhDashboard.png)
 
-Windows Enpoint Telemetry(Sysmon)
-- Installed Sysmon on Windows endpoints
-- Troubleshot Sysmon configuration to make sure that important events were being logged such as proccess creations and network connections (Event ID1, ID3)
-- validated sysmon first locally using wevtutil
-- Confirmed Wazuh agent was ingesting Sysmon logs
+Windows Endpoint Telemetry (Sysmon)
+Installed Sysmon on Windows endpoints
+Configured Sysmon to capture high-value telemetry such as:
+  - Process creation (Event ID 1)
+  - Network connections (Event ID 3)
+Validated Sysmon locally using wevtutil before forwarding
+Confirmed ingestion into Wazuh dashboard
 
-Internal Application Server (Blue/Green Deployment and Reverse Proxy)
-- Built a new Ubuntu server to act as an internal production application host
-- Deployed a simple Flask app and ran it as a systemd service (internal-app.service)
-- Added Nginx reverse proxy so the app is available on port 80
-- Created Nginx access and error logs
-- Added a Wazuh agent on the app server
-- Configures the Wazuh agent to take in all Nginx access and error logs to display on the Wazuh dashboard to make it easy to troubleshoot
+Internal Application Architecture (Production Simulation)
+Application Server (Blue/Green Deployment + Reverse Proxy)
+
+Built an Ubuntu application server hosting a Flask web application
+Implemented a strict /health endpoint that validates database connectivity
+Deployed the application using blue/green systemd services:
+  - internal-app-blue (port 5000)
+  - internal-app-green (port 5001)
+Configured Nginx reverse proxy to provide a stable front-door endpoint on port 80
+Implemented Nginx upstream routing to switch production traffic between blue and green backends without client impact
+Created a deployment/rollback script (switch-app.sh) that:
+  - Performs health validation before switching traffic
+  - Updates the active upstream
+  - Reloads Nginx safely
+  - Logs all deployment actions
+Added a Wazuh agent to ingest Nginx logs for operational visibility
 ![internalappbrowser](Images/InternalAppRunning.png)
 
 Nginx Logs
