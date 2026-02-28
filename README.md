@@ -6,7 +6,9 @@ The environment combines endpoint telemetry, centralized SIEM monitoring, and a 
 
 The lab uses Wazuh as the SIEM platform, Windows and Linux endpoints for telemetry, and a Kali Linux machine to simulate external attacker behavior. The environment evolved into a production-style architecture that includes an internal web application and a dedicated database server, enabling realistic monitoring of service dependencies and outage scenarios.
 
-Environment
+Architecture Overview 
+
+Core Architecture 
 Ubuntu Linux — Wazuh Manager, Indexer, and Dashboard
 Windows Server — Domain Controller
 Windows 10 — User Endpoint
@@ -20,7 +22,7 @@ Sysmon (process and network telemetry)
 Linux syslog
 Authentication events (domain + local)
 Nginx access and error logs
-Application health logs
+Application health monitoring logs
 Watchdog automation logs
 Deployment and triage automation logs
 
@@ -109,6 +111,31 @@ Captures:
 Added cooldown logic to prevent alert/triage noise
 
 ![TriageBundle](Images/triagebundlelog.png)
+
+KPI & Metrics Engine
+Built a custom metrics aggregation engine:
+Generates:
+24h Uptime %
+Total health checks
+OK / FAIL count
+MTTR (Mean Time To Recovery)
+Auto restarts (24h)
+Severity score (0–100)
+30-minute anomaly detection window
+All metrics are exported as structured JSON and served via Nginx to a real-time dashboard.
+
+AI-Style Operational Insights Engine
+Implemented a lightweight inference layer that:
+Detects restart storms
+Identifies flapping behavior
+Evaluates SLO compliance
+Scores system risk (severity index)
+Generates:
+Insights
+Likely causes
+Recommended actions
+This simulates intelligent ITSI-style monitoring and automation workflows.
+
 
 Attack Simulation
 Used Kali Linux to simulate attacker activity:
